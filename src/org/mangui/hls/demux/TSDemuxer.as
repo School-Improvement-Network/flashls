@@ -161,7 +161,7 @@ package org.mangui.hls.demux {
         /** flux demux **/
         private function _flush() : void {
             CONFIG::LOGGING {
-                Log.debug("TS: flushing demux");
+                Log.debug("TS: flushing demux: " + _curAudioPES.length);
             }            
             // check whether last parsed audio PES is complete
             if (_curAudioPES && _curAudioPES.length > 14) {

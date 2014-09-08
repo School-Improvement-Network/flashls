@@ -847,12 +847,14 @@ package org.mangui.hls.stream {
                 _hls.dispatchEvent(new HLSEvent(HLSEvent.ERROR, hlsError));
             }
             if (fragData.audio_found) {
+                null; // just to avoid compilaton warnings if CONFIG::LOGGING is false
                 CONFIG::LOGGING {
                     Log.debug("m/M audio PTS:" + fragData.pts_min_audio + "/" + fragData.pts_max_audio);
                 }
             }
 
             if (fragData.video_found) {
+                null; // just to avoid compilaton warnings if CONFIG::LOGGING is false
                 CONFIG::LOGGING {
                     Log.debug("m/M video PTS:" + fragData.pts_min_video + "/" + fragData.pts_max_video);
                 }

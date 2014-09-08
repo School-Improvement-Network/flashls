@@ -1,7 +1,7 @@
 #!/bin/bash
-#FLEXPATH=../../flex_sdk_4.6
+FLEXPATH=../../../flex_sdk_4.6
 #FLEXPATH=../../apache_flex_sdk
-FLEXPATH=../../AIR_SDK
+#FLEXPATH=../../AIR_SDK
 
 OPT_DEBUG="-use-network=false \
     -optimize=true \
@@ -16,14 +16,14 @@ $FLEXPATH/bin/compc \
     $OPT_DEBUG \
     -include-sources ../src/org/mangui/hls \
     -output ../bin/debug/flashls.swc \
-    -target-player="10.1"
+    -target-player="11.1"
 
 echo "Compiling bin/release/flashls.swc"
 $FLEXPATH/bin/compc \
     $OPT_RELEASE \
     -include-sources ../src/org/mangui/hls \
     -output ../bin/release/flashls.swc \
-    -target-player="10.1"
+    -target-player="11.1"
 
 
 echo "Compiling bin/release/flashlsChromeless.swf"
