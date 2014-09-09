@@ -847,8 +847,18 @@ package org.mangui.hls.stream {
 
             var fragData : FragmentData = _frag_current.data;
             if (!fragData.audio_found && !fragData.video_found) {
-                hlsError = new HLSError(HLSError.FRAGMENT_PARSING_ERROR, _frag_current.url, "error parsing fragment, no tag found");
-                _hls.dispatchEvent(new HLSEvent(HLSEvent.ERROR, hlsError));
+                if (_seqnum == _levels[level].end_seqnum) {
+                    // if last segment was last fragment of VOD playlist, assume it was invalid/uneeded, notify last fragment loaded event, and return.
+                    if (_hls.type == HLSTypes.VOD) {
+                        _hls.dispatchEvent(new HLSEvent(HLSEvent.LAST_VOD_FRAGMENT_LOADED));
+                        // stop loading timer as well, as no other fragments can be loaded
+                        _timer.stop();
+                    }
+                    return;
+                } else {
+                    hlsError = new HLSError(HLSError.FRAGMENT_PARSING_ERROR, _frag_current.url, "error parsing fragment, no tag found");
+                    _hls.dispatchEvent(new HLSEvent(HLSEvent.ERROR, hlsError));
+                }
             }
             if (fragData.audio_found) {
                 null; // just to avoid compilaton warnings if CONFIG::LOGGING is false
