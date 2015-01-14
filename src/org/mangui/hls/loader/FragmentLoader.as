@@ -46,6 +46,8 @@ package org.mangui.hls.loader {
         private var _last_loaded_level : int;
         /** Reference to the manifest levels. **/
         private var _levels : Vector.<Level>;
+        /** Global reference to sequence number that's currently loading. **/
+        private var _seqnum : int;
         /** Util for loading the fragment. **/
         private var _fragstreamloader : URLStream;
         /** Util for loading the key. **/
@@ -618,6 +620,9 @@ package org.mangui.hls.loader {
                 }
             }
 
+            // copy last_seqnum for handling segments in f
+            _seqnum = last_seqnum;
+
             if (_pts_analyzing == false) {
                 if (last_seqnum == _levels[level].end_seqnum) {
                     // if last segment of level already loaded, return
@@ -822,8 +827,18 @@ package org.mangui.hls.loader {
             var hlsError : HLSError;
             var fragData : FragmentData = _frag_current.data;
             if (!fragData.audio_found && !fragData.video_found) {
-                hlsError = new HLSError(HLSError.FRAGMENT_PARSING_ERROR, _frag_current.url, "error parsing fragment, no tag found");
-                _hls.dispatchEvent(new HLSEvent(HLSEvent.ERROR, hlsError));
+                if (_seqnum == _levels[level].end_seqnum) {
+                    // if last segment was last fragment of VOD playlist, assume it was invalid/uneeded, notify last fragment loaded event, and return.
+                    if (_hls.type == HLSTypes.VOD) {
+                        _hls.dispatchEvent(new HLSEvent(HLSEvent.LAST_VOD_FRAGMENT_LOADED));
+                        // stop loading timer as well, as no other fragments can be loaded
+                        _timer.stop();
+                    }
+                    return;
+                } else {
+                    hlsError = new HLSError(HLSError.FRAGMENT_PARSING_ERROR, _frag_current.url, "error parsing fragment, no tag found");
+                    _hls.dispatchEvent(new HLSEvent(HLSEvent.ERROR, hlsError));
+                }
             }
             if (fragData.audio_found) {
                 null;
